@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tmdb/bloc/popular_movies_bloc.dart';
+import 'package:flutter_tmdb/core/services/movie_service.dart';
+import 'package:flutter_tmdb/widgets/cast_carousel.dart';
+import 'package:flutter_tmdb/widgets/movie_carousel.dart';
+import 'package:flutter_tmdb/widgets/movie_filter_buttons.dart';
 
-class HomePageView extends StatelessWidget {
+class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
+
+  @override
+  State<HomePageView> createState() => _HomePageViewState();
+}
+
+class _HomePageViewState extends State<HomePageView> {
+  MovieListType _currentMovieType = MovieListType.popular;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Películas Populares'),
+        title: const Text('The Movie DB'),
       ),
       body: BlocProvider(
         create: (context) => PopularMoviesBloc()
-          ..add(const FetchPopularMoviesEvent()),
+          ..add(FetchPopularMoviesEvent(movieListType: _currentMovieType)),
         child: BlocBuilder<PopularMoviesBloc, PopularMoviesState>(
           builder: (context, state) {
             if (state is PopularMoviesInitial) {
@@ -25,88 +36,73 @@ class HomePageView extends StatelessWidget {
                 child: CircularProgressIndicator(),
               );
             } else if (state is PopularMoviesLoaded) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: state.movies.length,
-                  itemBuilder: (context, index) {
-                    final movie = state.movies[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: Card(
-                        elevation: 4,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: SizedBox(
-                            width: 150,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Poster Image
-                                movie.posterPath != null
-                                    ? Image.network(
-                                        'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                                        height: 200,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            height: 200,
-                                            color: const Color.fromARGB(255, 126, 124, 124),
-                                            child: const Icon(Icons.image_not_supported),
-                                          );
-                                        },
-                                      )
-                                    : Container(
-                                        height: 200,
-                                        color: Colors.grey[300],
-                                        child: const Icon(Icons.image_not_supported),
-                                      ),
-                                // Movie Info
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          movie.title,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.star,
-                                                size: 12,
-                                                color: Colors.amber),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              movie.voteAverage
-                                                  .toStringAsFixed(1),
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Películas',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
+                              ),
+                              MovieFilterButtons(
+                                currentMovieType: _currentMovieType,
+                                onPopularPressed: () {
+                                  setState(() {
+                                    _currentMovieType = MovieListType.popular;
+                                  });
+                                  context.read<PopularMoviesBloc>().add(
+                                    FetchPopularMoviesEvent(
+                                      movieListType: MovieListType.popular,
+                                    ),
+                                  );
+                                },
+                                onTopRatedPressed: () {
+                                  setState(() {
+                                    _currentMovieType = MovieListType.topRated;
+                                  });
+                                  context.read<PopularMoviesBloc>().add(
+                                    FetchPopularMoviesEvent(
+                                      movieListType: MovieListType.topRated,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          MovieCarousel(movies: state.movies),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Actores Principales',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 12),
+                          CastCarousel(castList: state.castList),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               );
             } else if (state is PopularMoviesError) {

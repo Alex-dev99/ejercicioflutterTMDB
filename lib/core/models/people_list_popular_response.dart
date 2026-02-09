@@ -13,13 +13,11 @@ class PeopleListPopularResponse {
     this.totalResults,
   });
 
-  // --- MÉTODOS DE INTERFAZ RAW JSON ---
   factory PeopleListPopularResponse.fromRawJson(String str) =>
       PeopleListPopularResponse.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  // --- MAPEO ---
   factory PeopleListPopularResponse.fromJson(Map<String, dynamic> json) =>
       PeopleListPopularResponse(
         page: json["page"],
@@ -92,16 +90,16 @@ class KnownFor {
   final String? backdropPath;
   final List<int> genreIds;
   final int id;
-  final String? mediaType; // "movie" o "tv"
+  final String? mediaType; 
   final String originalLanguage;
-  final String? originalTitle; // Para películas
-  final String? originalName; // Para series TV
+  final String? originalTitle; 
+  final String? originalName; 
   final String overview;
   final String? posterPath;
-  final String? releaseDate; // Para películas
-  final String? firstAirDate; // Para series TV
-  final String? title; // Para películas
-  final String? name; // Para series TV
+  final String? releaseDate; 
+  final String? firstAirDate; 
+  final String? title; 
+  final String? name; 
   final bool? video;
   final double voteAverage;
   final int voteCount;
@@ -170,9 +168,7 @@ class KnownFor {
     "vote_count": voteCount,
   };
 
-  /// Método de conveniencia para obtener el nombre sin importar si es TV o Película
   String get displayTitle => title ?? name ?? "Sin título";
 
-  /// Método de conveniencia para obtener la fecha sin importar si es TV o Película
   String get displayDate => releaseDate ?? firstAirDate ?? "N/A";
 }
