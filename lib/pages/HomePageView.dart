@@ -28,9 +28,7 @@ class _HomePageViewState extends State<HomePageView> {
         child: BlocBuilder<PopularMoviesBloc, PopularMoviesState>(
           builder: (context, state) {
             if (state is PopularMoviesInitial) {
-              return const Center(
-                child: Text('Presiona para cargar películas'),
-              );
+
             } else if (state is PopularMoviesLoading) {
               return const Center(
                 child: CircularProgressIndicator(),

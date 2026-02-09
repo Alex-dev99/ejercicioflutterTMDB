@@ -20,9 +20,7 @@ class MovieFilterButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: currentMovieType == MovieListType.popular ? null : onPopularPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: currentMovieType == MovieListType.popular
-                ? Colors.deepPurple
-                : Colors.white,
+            backgroundColor: Colors.white
           ),
           child: const Text(
             'Popular',
@@ -33,9 +31,7 @@ class MovieFilterButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: currentMovieType == MovieListType.topRated ? null : onTopRatedPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: currentMovieType == MovieListType.topRated
-                ? Colors.deepPurple
-                : Colors.white,
+            backgroundColor: Colors.white
           ),
           child: const Text(
             'Top Rated',
